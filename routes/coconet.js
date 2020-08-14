@@ -2,6 +2,9 @@ var express = require('express');
 var router = express.Router();
 var core = require('@magenta/music/node/core');
 
+const tf_node = require('@tensorflow/tfjs-node');
+const tf = require('@tensorflow/tfjs');
+
 // Nasty, nasty hack
 global.navigator = {userAgent: "Node"};
 var coconet = require('@magenta/music/node/coconet');
@@ -26,21 +29,28 @@ router.get('/', function(req, res, next){
     model.infill(sequence, {
         temperature: 0.99
     }).then((output) =>{
-        console.log(req);
         res.send(output);
+    }).catch((reason)=>{
+        console.log(reason);
     });
 });
 
 router.post('/', (req, res, next) => {
-    /* console.log(JSON.parse(req.body.note_sequence)); */
 
-    var note_sequence = JSON.parse(req.body.note_sequence);
+    var note_sequence = req.body.note_sequence
     var temperature = req.body.temperature || 0.99;
+
+
     model.infill(note_sequence, {
         temperature: 0.99
-    }).then((output) =>{
-        res.send(output);
+    }).then((output) => {
+        var seq = core.sequences.mergeConsecutiveNotes(output);
+        res.send(seq);
+    }).catch((reason) => {
+        console.log(reason);
+        res.status(500).send();
     });
+
 });
 
 module.exports = router;
