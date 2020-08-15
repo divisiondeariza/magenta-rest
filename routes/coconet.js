@@ -40,7 +40,7 @@ router.post('/', (req, res, next) => {
     var note_sequence = req.body.note_sequence
     var temperature = req.body.temperature || 0.99;
     input = core.sequences.concatenate([note_sequence]);
-    input["totalQuantizedSteps"] = input.notes.length;
+    input["totalQuantizedSteps"] = Math.max(input.notes.map(note => note.quantizedEndStep)) + 1;
 
     model.infill(input, {
         temperature: 0.99,
@@ -48,6 +48,7 @@ router.post('/', (req, res, next) => {
         var seq = core.sequences.mergeConsecutiveNotes(output);
         res.send(seq);
     }).catch((reason) => {
+        console.log(input);
         console.log(reason);
         res.status(500).send();
     });
