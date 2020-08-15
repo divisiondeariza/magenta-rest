@@ -39,10 +39,11 @@ router.post('/', (req, res, next) => {
 
     var note_sequence = req.body.note_sequence
     var temperature = req.body.temperature || 0.99;
+    input = core.sequences.concatenate([note_sequence]);
+    input["totalQuantizedSteps"] = input.notes.length;
 
-
-    model.infill(note_sequence, {
-        temperature: 0.99
+    model.infill(input, {
+        temperature: 0.99,
     }).then((output) => {
         var seq = core.sequences.mergeConsecutiveNotes(output);
         res.send(seq);
