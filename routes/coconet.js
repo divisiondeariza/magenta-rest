@@ -1,12 +1,48 @@
 var express = require('express');
 var router = express.Router();
-var core = require('@magenta/music/node/core');
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+//const tf_node = require('@tensorflow/tfjs-node');
 
-const tf_node = require('@tensorflow/tfjs-node');
-const tf = require('@tensorflow/tfjs');
+
+
+const tf = require('@tensorflow/tfjs-core');
+
+const nodeGles = require('node-gles');
+
+const nodeGl = nodeGles.binding.createWebGLRenderingContext();
+
+// TODO(kreeger): These are hard-coded GL integration flags. These need to be
+// updated to ensure they work on all systems with proper exception reporting.
+tf.env().set('WEBGL_VERSION', 2);
+tf.env().set('WEBGL_RENDER_FLOAT32_ENABLED', true);
+tf.env().set('WEBGL_DOWNLOAD_FLOAT_ENABLED', true);
+tf.env().set('WEBGL_FENCE_API_ENABLED', true);  // OpenGL ES 3.0 and higher..
+tf.env().set('HAS_WEBGL', true);  // OpenGL ES 3.0 and higher..
+tf.env().set(
+    'WEBGL_MAX_TEXTURE_SIZE', nodeGl.getParameter(nodeGl.MAX_TEXTURE_SIZE));
+tf.webgl.setWebGLContext(2, nodeGl);
+
+tf.registerBackend('headless-nodegl', () => {
+  // TODO(kreeger): Consider moving all GL creation here. However, weak-ref to
+  // GL context tends to cause an issue when running unit tests:
+  // https://github.com/tensorflow/tfjs/issues/1732
+  return new tf.webgl.MathBackendWebGL(new tf.webgl.GPGPUContext(nodeGl));
+}, 3 /* priority */);
+
+tf.setBackend('headless-nodegl', true);
 
 // Nasty, nasty hack
+const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
 global.navigator = {userAgent: "Node"};
+//global.window = dom.window;
+global.document = dom.window.document;
+//global.gl = nodeGl;
+
+
+
+
+var core = require('@magenta/music/node/core');
 var coconet = require('@magenta/music/node/coconet');
 
 const model_url = 'https://storage.googleapis.com/magentadata/js/checkpoints/coconet/bach';
