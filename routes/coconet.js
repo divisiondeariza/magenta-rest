@@ -2,14 +2,17 @@ var express = require('express');
 var router = express.Router();
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
-//const tf_node = require('@tensorflow/tfjs-node');
 
+// Nasty, nasty hack
+const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
+global.navigator = {userAgent: "Node"};
+//global.document = dom.window.document;
+var core = require('@magenta/music/node/core');
+var coconet = require('@magenta/music/node/coconet');
 
 
 const tf = require('@tensorflow/tfjs-core');
-
 const nodeGles = require('node-gles');
-
 const nodeGl = nodeGles.binding.createWebGLRenderingContext();
 
 // TODO(kreeger): These are hard-coded GL integration flags. These need to be
@@ -32,18 +35,7 @@ tf.registerBackend('headless-nodegl', () => {
 
 tf.setBackend('headless-nodegl', true);
 
-// Nasty, nasty hack
-const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
-global.navigator = {userAgent: "Node"};
-//global.window = dom.window;
-global.document = dom.window.document;
-//global.gl = nodeGl;
 
-
-
-
-var core = require('@magenta/music/node/core');
-var coconet = require('@magenta/music/node/coconet');
 
 const model_url = 'https://storage.googleapis.com/magentadata/js/checkpoints/coconet/bach';
 var model = new coconet.Coconet(model_url);
