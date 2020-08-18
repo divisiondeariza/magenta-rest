@@ -1,36 +1,45 @@
 var express = require('express');
 var router = express.Router();
-var core = require('@magenta/music/node/core');
 
-const tf_node = require('@tensorflow/tfjs-node');
+
+//const tf_node = require('@tensorflow/tfjs-node');
 const tf = require('@tensorflow/tfjs');
+require('@tensorflow/tfjs-backend-wasm');
 
-// Nasty, nasty hack
-global.navigator = {userAgent: "Node"};
-var coconet = require('@magenta/music/node/coconet');
 
 const model_url = 'https://storage.googleapis.com/magentadata/js/checkpoints/coconet/bach';
-var model = new coconet.Coconet(model_url);
+// Nasty, nasty hack
+global.navigator = { userAgent: "Node" };
 
-/* Generate NoteSequences from Coconet Model */
-model.initialize();
+var model, core, coconet = null;
 
+tf.setBackend("wasm").then(() => {
+    core = require('@magenta/music/node/core');
+    coconet = require('@magenta/music/node/coconet');
+    model = new coconet.Coconet(model_url);
 
-router.get('/', function(req, res, next){
-    var sequence = {notes:[
-        { pitch: 64,
-          instrument: "0",
-          quantizedStartStep: 0,
-          quantizedEndStep: 3
-        }
-    ], quantizationInfo: {stepsPerQuarter: 4}};
+    /* Generate NoteSequences from Coconet Model */
+    model.initialize();
+});
+
+router.get('/', function (req, res, next) {
+    var sequence = {
+        notes: [
+            {
+                pitch: 64,
+                instrument: "0",
+                quantizedStartStep: 0,
+                quantizedEndStep: 3
+            }
+        ], quantizationInfo: { stepsPerQuarter: 4 }
+    };
 
 
     model.infill(sequence, {
         temperature: 0.99
-    }).then((output) =>{
+    }).then((output) => {
         res.send(output);
-    }).catch((reason)=>{
+    }).catch((reason) => {
         console.log(reason);
     });
 });
