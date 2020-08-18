@@ -1,14 +1,15 @@
 var express = require('express');
 var router = express.Router();
-var core = require('@magenta/music/node/core');
+
 
 const tf_node = require('@tensorflow/tfjs-node');
 const tf = require('@tensorflow/tfjs');
 
 // Nasty, nasty hack
 global.navigator = {userAgent: "Node"};
-var coconet = require('@magenta/music/node/coconet');
 
+var coconet = require('@magenta/music/node/coconet');
+var core = require('@magenta/music/node/core');
 const model_url = 'https://storage.googleapis.com/magentadata/js/checkpoints/coconet/bach';
 var model = new coconet.Coconet(model_url);
 
@@ -27,7 +28,8 @@ router.get('/', function(req, res, next){
 
 
     model.infill(sequence, {
-        temperature: 0.99
+        temperature: 0.99,
+        numIterations: 10000,
     }).then((output) =>{
         res.send(output);
     }).catch((reason)=>{
