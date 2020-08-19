@@ -3,10 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "export LD_PRELOAD=$LD_PRELOAD:/usr/lib/x86_64-linux-gnu/libjemalloc.so; node ./bin/www",
-    "install-my-magenta": "git clone https://github.com/divisiondeariza/magenta-js.git; cd magenta-js/music; npm install; npm run-script build; cd -; mv magenta-js node_modules/@magenta"
+    "start": "node ./bin/www"
   },
   "dependencies": {
+    "@magenta/music": "file:@magenta/music",
     "@tensorflow/tfjs": "^1.7.0",
     "@tensorflow/tfjs-node": "^1.7.0",
     "body-parser": "^1.19.0",

@@ -21,7 +21,7 @@ tf.env().set('WEBGL_VERSION', 2);
 tf.env().set('WEBGL_RENDER_FLOAT32_ENABLED', true);
 tf.env().set('WEBGL_DOWNLOAD_FLOAT_ENABLED', true);
 tf.env().set('WEBGL_FENCE_API_ENABLED', true);  // OpenGL ES 3.0 and higher..
-tf.env().set('HAS_WEBGL', true);  // OpenGL ES 3.0 and higher..
+//tf.env().set('HAS_WEBGL', true);  // OpenGL ES 3.0 and higher..
 tf.env().set(
     'WEBGL_MAX_TEXTURE_SIZE', nodeGl.getParameter(nodeGl.MAX_TEXTURE_SIZE));
 tf.webgl.setWebGLContext(2, nodeGl);
@@ -35,7 +35,7 @@ tf.registerBackend('headless-nodegl', () => {
 
 tf.setBackend('headless-nodegl', true);
 
-
+//require('@tensorflow/tfjs-node');
 
 const model_url = 'https://storage.googleapis.com/magentadata/js/checkpoints/coconet/bach';
 var model = new coconet.Coconet(model_url);
@@ -68,7 +68,7 @@ router.post('/', (req, res, next) => {
     var note_sequence = req.body.note_sequence
     var temperature = req.body.temperature || 0.99;
     input = core.sequences.concatenate([note_sequence]);
-    input["totalQuantizedSteps"] = Math.max(input.notes.map(note => note.quantizedEndStep)) + 1;
+    input["totalQuantizedSteps"] = Math.max(...input.notes.map(note => note.quantizedEndStep));
 
     model.infill(input, {
         temperature: 0.99,
