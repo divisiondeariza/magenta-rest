@@ -6,7 +6,6 @@ const { JSDOM } = jsdom;
 // Nasty, nasty hack
 const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
 global.navigator = {userAgent: "Node"};
-//global.document = dom.window.document;
 var core = require('@magenta/music/node/core');
 var coconet = require('@magenta/music/node/coconet');
 
@@ -21,7 +20,6 @@ tf.env().set('WEBGL_VERSION', 2);
 tf.env().set('WEBGL_RENDER_FLOAT32_ENABLED', true);
 tf.env().set('WEBGL_DOWNLOAD_FLOAT_ENABLED', true);
 tf.env().set('WEBGL_FENCE_API_ENABLED', true);  // OpenGL ES 3.0 and higher..
-//tf.env().set('HAS_WEBGL', true);  // OpenGL ES 3.0 and higher..
 tf.env().set(
     'WEBGL_MAX_TEXTURE_SIZE', nodeGl.getParameter(nodeGl.MAX_TEXTURE_SIZE));
 tf.webgl.setWebGLContext(2, nodeGl);
@@ -35,7 +33,6 @@ tf.registerBackend('headless-nodegl', () => {
 
 tf.setBackend('headless-nodegl', true);
 
-//require('@tensorflow/tfjs-node');
 
 const model_url = 'https://storage.googleapis.com/magentadata/js/checkpoints/coconet/bach';
 var model = new coconet.Coconet(model_url);
